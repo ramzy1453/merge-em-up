@@ -13,6 +13,7 @@
 	let show_menu = false;
 	let container: HTMLElement;
 	import ItemDiv from '$lib/ItemDiv.svelte';
+	import { Toaster } from 'svelte-french-toast';
 
 	onMount(() => {
 		initSimulation(items, container);
@@ -31,6 +32,7 @@
 	on:dblclick={(e) => mouseDBClick(items, e)}
 >
 	<CheatBar />
+	<Toaster />
 
 	{#each $items as item (item.id)}
 		<ItemDiv {item} />

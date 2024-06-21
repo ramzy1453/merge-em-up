@@ -11,12 +11,16 @@ const webSocketServer = {
     const io = new Server(server.httpServer);
 
     io.on("connection", (socket) => {
-      console.log(`Socket connected: ${socket.id}`);
-      socket.emit("eventFromServer", "Hello, World 👋");
+      socket.broadcast.emit("join-room");
 
       socket.on("submit-word", (item: Item) => {
         console.log("submit-word", item);
-        io.emit("word-submitted", item);
+        socket.broadcast.emit("word-submitted", item);
+      });
+
+      socket.on("merge-word", (item: Item) => {
+        console.log("merge-word", item);
+        socket.broadcast.emit("word-merged", item);
       });
     });
   },

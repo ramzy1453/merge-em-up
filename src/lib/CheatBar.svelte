@@ -1,6 +1,25 @@
 <script lang="ts">
 	import { items } from '../routes/merge/itemState';
 	import { onMount } from 'svelte';
+  	import type { Item } from './types';
+	import toast from 'svelte-french-toast';
+	import { io } from 'socket.io-client'
+
+	const socket = io()
+
+	socket.on('join-room', () => {
+		toast.success(`User ${socket.id} Joined`, {
+			duration: 3000,
+		})
+
+	})
+
+	socket.on('word-submitted', 
+		(item: Item) => {
+			$items.push(item)
+		}
+	)
+
 
 	let processing = false;
 	let textInput: HTMLInputElement;
@@ -26,7 +45,8 @@
 		let emoji = '';
 		let emoji_res = await fetch(`/api/emoji?word=${word}`);
 		if (emoji_res.status == 200) emoji = await emoji_res.text();
-		$items.push({
+
+		const item : Item = {
 			word: word,
 			emoji: emoji,
 			position: {
@@ -36,7 +56,11 @@
 			held: false,
 			status: 'free',
 			id: Math.random(),
-		});
+		};
+		
+
+		socket.emit('submit-word', item)
+		$items.push(item);
 		if (textInput.value == word) textInput.value = '';
 		processing = false;
 	};
